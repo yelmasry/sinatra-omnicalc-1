@@ -47,17 +47,26 @@ get("/payment/new") do
 end
 
 get("/payment/results") do   
-  @apr = ((params.fetch("APR_user").to_f) / 100 / 12 ).round(4) #to_fs(:percentage, { :precision => 0 })
+  @apr = ((params.fetch("APR_user").to_f) / 100 / 12 ).round(4)   
   
   @years = (params.fetch("years_user")).to_i * 12 
 
-  @principal = (params.fetch("principal_user")).to_f(:currency)
+  @principal = (params.fetch("principal_user")).to_f
+
+
+  @formatted_apr = @apr.to_fs(:percentage, { :precision => 0 })
+
+  @formatted_principal = @principal.to_fs(:currency)
+
+
 
   @numerator = @apr * @principal 
 
-  @denominator = 1 - (1 + @apr) ** @years 
+  @denominator = 1 - (1 + @apr) ** -@years 
 
   @present_value = @numerator / @denominator 
+
+  @formatted_present_value = @present_value.to_fs(:currency)
   
   erb(:payment_results) 
 end 
